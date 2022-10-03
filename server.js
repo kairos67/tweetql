@@ -1,6 +1,6 @@
 // graphql, apollo server test
 import { ApolloServer, gql } from "apollo-server";
-const tweets =[
+let tweets = [
     {
         id: "1",
         text: "Hello, world 1!",
@@ -10,6 +10,13 @@ const tweets =[
         text: "Hello, world 2!",
     },
 ];
+let users = [{
+    id:"1",
+    firstName: "Kairo",
+    lastName: "Jeong",
+}
+
+];
 
 const typeDefs = gql`
     type User{
@@ -17,6 +24,7 @@ const typeDefs = gql`
         username:String!
         firstName:String!
         lastName:String
+        fullName:String
     }
     type Tweet{
         id:ID
@@ -24,6 +32,7 @@ const typeDefs = gql`
         author:User
     }
     type Query{
+        allUsers:[User!]!
         allTweets: [Tweet]
         tweet(id:ID!): Tweet
         ping: String
@@ -38,22 +47,42 @@ const typeDefs = gql`
 //post /api/v1/tweets
 //GET /api/v1/tweet/:id
 
-const resolvers ={
-    Query:{
-        allTweets(){
+const resolvers = {
+    Query: {
+        allTweets() {
             return tweets;
+        },        
+        allUsers(){
+            return users;
         },
         // tweet() {
         //      console.log("I'm a tweet");
         //     return null;
         // },
-        tweet(root, {id}) {
+        tweet(root, { id }) {
             // console.log(args);
-            return tweets.find((tweet)=> tweet.id === id);
+            return tweets.find((tweet) => tweet.id === id);
         },
         // ping(){
         //     return "pong";
         // },
+    },
+    Mutation: {
+        postTweet(_, { text, userId }) {
+            const newTweet = {
+                id: tweets.length + 1,
+                text,
+            };
+            tweets.push(newTweet);
+            return newTweet;
+        },
+        deleteTweet(_, {id}) {
+        },
+    },
+    User:{
+        fullName({firstName, lastName}){
+            return `${firstName} ${lastName}`;
+        },
     },
 };
 
