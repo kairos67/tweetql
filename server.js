@@ -4,10 +4,12 @@ let tweets = [
     {
         id: "1",
         text: "Hello, world 1!",
+        userId: "2"
     },
     {
         id: "2",
         text: "Hello, world 2!",
+        userId: "1"
     },
 ];
 let users = [{
@@ -80,10 +82,18 @@ const resolvers = {
         },
     },
     User:{
+        firstName({firstName}){
+            return this.firstName;
+        },
         fullName({firstName, lastName}){
             return `${firstName} ${lastName}`;
         },
     },
+    Tweet:{
+        author({userId}){
+            return users.find((user) => user.id === userId);
+        }
+    }
 };
 
 const server = new ApolloServer({ typeDefs, resolvers });
